@@ -42,7 +42,7 @@ func main() {
 	failCount := 0
 
 	fileSystem := os.DirFS(path)
-	fs.WalkDir(fileSystem, ".", func(filePath string, d fs.DirEntry, err error) error {
+	err := fs.WalkDir(fileSystem, ".", func(filePath string, d fs.DirEntry, err error) error {
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -65,6 +65,9 @@ func main() {
 		}
 		return nil
 	})
+	if err != nil {
+		log.Fatal("Error walking trough directory: ", err)
+	}
 
 	fmt.Printf("%d total files:\n", successCount+partialSuccessCount+failCount)
 	fmt.Printf("- %d successfull\n", successCount)

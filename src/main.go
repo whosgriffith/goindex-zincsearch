@@ -2,17 +2,38 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"indexing-zincsearch/helpers"
 	"io/fs"
 	"log"
 	"os"
+	"runtime/pprof"
 )
 
+var cpuprofile = flag.String("cpu.prof", "", "write cpu profile to `file`")
+
 func main() {
-	//const path string = "/Users/risker/Documents/enron_mail_20110402/maildir"
-	const path string = "/Users/risker/Documents/enron_mail_full/maildir"
-	//const path string = "/Users/risker/Documents/enron_mail_full/maildir/baughman-d/calendar/19."
+	// Profiling
+	flag.Parse()
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal("could not create CPU profile: ", err)
+		}
+		defer func(f *os.File) {
+			err := f.Close()
+			if err != nil {
+				log.Fatal("Error closing file: ", err)
+			}
+		}(f) // error handling omitted for example
+		if err := pprof.StartCPUProfile(f); err != nil {
+			log.Fatal("could not start CPU profile: ", err)
+		}
+		defer pprof.StopCPUProfile()
+	}
+
+	const path string = "directory"
 
 	var emailsSlice []helpers.Email
 
@@ -39,7 +60,6 @@ func main() {
 				emailsSlice = append(emailsSlice, email)
 				partialSuccessCount++
 			case "fail":
-				fmt.Println(filePath)
 				failCount++
 			}
 		}

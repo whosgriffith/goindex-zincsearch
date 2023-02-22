@@ -13,3 +13,8 @@ type Email struct {
 	To        []*mail.Address
 	Content   string
 }
+
+type ZincBodyBulkV2 struct {
+	Index   string
+	Records []Email
+}
